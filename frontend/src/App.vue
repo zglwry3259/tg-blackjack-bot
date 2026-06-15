@@ -80,7 +80,7 @@
 import { ref, onMounted } from 'vue'
 
 // ===== 配置 - 修改为你的Worker域名！=====
-const API_BASE_URL = 'https://your-worker.workers.dev'  // ⚠️ 这里是Worker域名！
+const API_BASE_URL = 'https://game.ttyun.eu.org/'  // ⚠️ 这里是Worker域名！
 // =====================================
 
 const room = ref(null)
