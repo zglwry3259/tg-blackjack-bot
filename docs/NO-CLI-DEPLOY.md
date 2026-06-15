@@ -1,9 +1,14 @@
 # 🚀 真正零命令行部署指南（全程网页点击）
 
 > ⚠️ **非常重要：Worker 和 Pages 是两个独立部署！**
-> - **Worker** = 后端Bot Webhook = 部署 `workers/` 代码
-> - **Pages** = 前端Web App = 部署 `frontend/` 代码
+> - **Worker域名** = 后端API接口 = 前端代码里的 `API_BASE_URL`
+> - **Pages域名** = 前端Web App界面 = 用户打开玩游戏的地址
 > - 它们是两个完全分开的服务，有各自的域名！不要搞混！
+>
+> ⚠️ **前后端通信关键配置：**
+> - 前端 `frontend/src/App.vue` 中的 `API_BASE_URL` 必须配置为 **Worker域名**
+> - 示例：`const API_BASE_URL = 'https://poker-bot.yourname.workers.dev'`
+> - ❌ 不要填Pages域名！否则CORS跨域错误
 
 > ✅ **推荐给所有用户**：不需要命令行，不需要git，不需要编程基础
 >

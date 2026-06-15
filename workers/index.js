@@ -1,159 +1,219 @@
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    
-    // 调试日志
-    console.log('收到请求:', request.method, url.pathname);
-    
-    // 测试路由 - 验证Worker运行和环境变量状态
-    if (url.pathname === '/test') {
-      return new Response(JSON.stringify({
-        status: 'ok',
-        message: 'Worker is running!',
-        env: {
-          hasToken: !!env.TELEGRAM_BOT_TOKEN,
-          hasSecret: !!env.WEBHOOK_SECRET,
-          hasWebAppUrl: !!env.TELEGRAM_WEB_APP_URL,
-          hasKV: !!env.ROOMS
-        }
-      }, null, 2), {
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-    
-    // 健康检查
-    if (url.pathname === '/' || url.pathname === '') {
-      return new Response('Poker Bot is running! Visit /test for details');
-    }
-    
-    // Webhook处理
-    if (url.pathname === '/webhook' && request.method === 'POST') {
-      try {
-        // 验证Webhook secret
-        const secretHeader = request.headers.get('X-Telegram-Bot-Api-Secret-Token');
-        console.log('Webhook Secret Header:', secretHeader);
-        console.log('Expected Secret:', env.WEBHOOK_SECRET);
-        
-        if (secretHeader !== env.WEBHOOK_SECRET) {
-          console.log('Webhook Secret 不匹配！');
-          return new Response('Unauthorized', { status: 401 });
-        }
-        
-        // 解析请求体
-        const update = await request.json();
-        console.log('收到Update:', JSON.stringify(update, null, 2));
-        
-        // 处理消息
-        if (update.message) {
-          const message = update.message;
-          const chatId = message.chat.id;
-          const text = message.text || '';
-          const userId = message.from.id;
-          const username = message.from.username || message.from.first_name;
-          
-          console.log('收到消息:', chatId, text, '来自:', username);
-          
-          // 处理命令
-          if (text === '/start') {
-            console.log('处理 /start 命令');
-            await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, 
-              `🎰 欢迎来到德州扑克游戏！\n\n` +
-              `命令：\n` +
-              `/newgame - 创建新游戏\n` +
-              `/rules - 游戏规则\n` +
-              `/help - 帮助`
-            );
-          }
-          else if (text === '/newgame') {
-            console.log('处理 /newgame 命令');
-            const roomId = generateRoomId();
-            await env.ROOMS.put(`room:${roomId}`, JSON.stringify({
-              id: roomId,
-              creator: userId,
-              players: [{ id: userId, name: username }],
-              status: 'waiting',
-              createdAt: Date.now()
-            }));
-            
-            const inviteLink = `${env.TELEGRAM_WEB_APP_URL}?room=${roomId}`;
-            await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, 
-              `✅ 游戏房间已创建！\n\n` +
-              `房间号: ${roomId}\n` +
-              `邀请链接: ${inviteLink}\n\n` +
-              `点击下方按钮开始游戏：`,
-              {
-                inline_keyboard: [[{
-                  text: '🎮 开始游戏',
-                  web_app: { url: inviteLink }
-                }]]
-              }
-            );
-          }
-          else if (text === '/rules') {
-            await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, 
-              `📖 德州扑克规则：\n\n` +
-              `1. 每人发2张底牌\n` +
-              `2. 分3轮发公共牌（3+1+1）\n` +
-              `3. 每轮可下注/跟注/弃牌\n` +
-              `4. 用7张牌选5张组成最大牌型\n\n` +
-              `牌型大小：同花顺 > 四条 > 葫芦 > 同花 > 顺子 > 三条 > 两对 > 一对 > 高牌`
-            );
-          }
-          else if (text === '/help') {
-            await sendMessage(env.TELEGRAM_BOT_TOKEN, chatId, 
-              `❓ 帮助：\n\n` +
-              `/newgame - 创建新游戏房间\n` +
-              `创建后分享邀请链接给好友\n` +
-              `点击Web App按钮进入游戏界面\n` +
-              `支持2-6人联机对战`
-            );
-          }
-        }
-        
-        return new Response('OK');
-      } catch (error) {
-        console.error('处理Webhook错误:', error);
-        return new Response('Error: ' + error.message, { status: 500 });
-      }
-    }
-    
-    return new Response('Not Found', { status: 404 });
-  }
-};
+// 第一行就执行，确保能在日志中看到
+console.log('=== WORKER SCRIPT LOADED ===');
 
-// 发送消息到Telegram
-async function sendMessage(token, chatId, text, replyMarkup = null) {
-  console.log('发送消息到:', chatId, '内容:', text.substring(0, 50));
-  
-  const body = {
-    chat_id: chatId,
-    text: text,
-    parse_mode: 'HTML'
-  };
-  
-  if (replyMarkup) {
-    body.reply_markup = replyMarkup;
-  }
-  
-  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-  
-  const result = await response.json();
-  console.log('Telegram API响应:', result);
-  
-  if (!result.ok) {
-    console.error('发送消息失败:', result);
-  }
-  
-  return result;
+// 给所有响应添加CORS头
+function addCorsHeaders(headers) {
+  headers.set('Access-Control-Allow-Origin', '*');
+  headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return headers;
 }
 
 // 生成房间ID
 function generateRoomId() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
+
+// 发送Telegram消息
+async function sendTelegramMessage(token, chatId, text) {
+  console.log('=== SENDING TELEGRAM MESSAGE ===');
+  console.log('Chat ID:', chatId);
+  console.log('Text:', text);
+  console.log('Token first 10 chars:', token.substring(0, 10) + '...');
+  
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: text
+      })
+    });
+    
+    const result = await response.json();
+    console.log('Telegram API response status:', response.status);
+    console.log('Telegram API result:', JSON.stringify(result));
+    
+    if (!result.ok) {
+      console.error('Telegram API error:', result.description);
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    throw error;
+  }
+}
+
+export default {
+  async fetch(request, env, ctx) {
+    // CORS 预检请求处理 - 最优先
+    if (request.method === 'OPTIONS') {
+      console.log('CORS Preflight request');
+      return new Response(null, {
+        headers: addCorsHeaders(new Headers()),
+      });
+    }
+    
+    // 第一步：打印请求信息
+    console.log('=== REQUEST RECEIVED ===');
+    console.log('Method:', request.method);
+    console.log('URL:', request.url);
+    console.log('Headers:', Object.fromEntries(request.headers));
+    
+    const url = new URL(request.url);
+    
+    try {
+      // 健康检查
+      if (url.pathname === '/' || url.pathname === '') {
+        console.log('Health check');
+        return new Response('Poker Bot is running!', {
+          headers: addCorsHeaders(new Headers())
+        });
+      }
+      
+      // 测试路由 - 诊断
+      if (url.pathname === '/test') {
+        console.log('Test route');
+        return new Response(JSON.stringify({
+          tokenExists: !!env.TELEGRAM_BOT_TOKEN,
+          tokenFirst10: env.TELEGRAM_BOT_TOKEN ? env.TELEGRAM_BOT_TOKEN.substring(0, 10) + '...' : 'NOT SET',
+          secretExists: !!env.WEBHOOK_SECRET,
+          webAppUrl: env.TELEGRAM_WEB_APP_URL || 'NOT SET',
+          kvExists: !!env.ROOMS
+        }, null, 2), {
+          headers: addCorsHeaders(new Headers({ 'Content-Type': 'application/json' }))
+        });
+      }
+      
+      // ==================== API 路由 ====================
+      
+      // API: 创建房间
+      if (url.pathname === '/api/room/create' && request.method === 'POST') {
+        console.log('API: 创建房间');
+        const body = JSON.parse(await request.text());
+        const roomId = generateRoomId();
+        const room = {
+          id: roomId,
+          creator: body.userId,
+          creatorName: body.userName,
+          players: [{ id: body.userId, name: body.userName, chips: 1000 }],
+          status: 'waiting',
+          createdAt: Date.now()
+        };
+        await env.ROOMS.put(`room:${roomId}`, JSON.stringify(room));
+        console.log('房间创建成功:', roomId);
+        return new Response(JSON.stringify({ success: true, room }), {
+          headers: addCorsHeaders(new Headers({ 'Content-Type': 'application/json' }))
+        });
+      }
+      
+      // API: 加入房间
+      if (url.pathname === '/api/room/join' && request.method === 'POST') {
+        console.log('API: 加入房间');
+        const body = JSON.parse(await request.text());
+        const roomData = await env.ROOMS.get(`room:${body.roomId}`);
+        if (!roomData) {
+          console.log('房间不存在:', body.roomId);
+          return new Response(JSON.stringify({ success: false, error: '房间不存在' }), {
+            headers: addCorsHeaders(new Headers({ 'Content-Type': 'application/json' }))
+          });
+        }
+        const room = JSON.parse(roomData);
+        room.players.push({ id: body.userId, name: body.userName, chips: 1000 });
+        await env.ROOMS.put(`room:${room.id}`, JSON.stringify(room));
+        console.log('加入房间成功:', body.roomId);
+        return new Response(JSON.stringify({ success: true, room }), {
+          headers: addCorsHeaders(new Headers({ 'Content-Type': 'application/json' }))
+        });
+      }
+      
+      // API: 获取房间状态
+      if (url.pathname.startsWith('/api/room/') && request.method === 'GET') {
+        const roomId = url.pathname.split('/').pop();
+        console.log('API: 获取房间', roomId);
+        const roomData = await env.ROOMS.get(`room:${roomId}`);
+        if (!roomData) {
+          return new Response(JSON.stringify({ success: false, error: '房间不存在' }), {
+            headers: addCorsHeaders(new Headers({ 'Content-Type': 'application/json' }))
+          });
+        }
+        return new Response(JSON.stringify({ success: true, room: JSON.parse(roomData) }), {
+          headers: addCorsHeaders(new Headers({ 'Content-Type': 'application/json' }))
+        });
+      }
+      
+      // ==================== Webhook 处理 ====================
+      
+      // Webhook处理
+      if (url.pathname === '/webhook' && request.method === 'POST') {
+        console.log('=== WEBHOOK PROCESSING START ===');
+        
+        // 克隆请求体（避免读取一次后无法再读）
+        const requestBody = await request.text();
+        console.log('Request body:', requestBody);
+        
+        let update;
+        try {
+          update = JSON.parse(requestBody);
+          console.log('Parsed update:', JSON.stringify(update));
+        } catch (e) {
+          console.error('JSON parse error:', e);
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        
+        // 处理消息
+        if (update.message && update.message.text) {
+          const chatId = update.message.chat.id;
+          const text = update.message.text;
+          console.log('Message received:', text, 'from chat:', chatId);
+          
+          // 响应 /start
+          if (text.startsWith('/start')) {
+            console.log('Handling /start command');
+            await sendTelegramMessage(env.TELEGRAM_BOT_TOKEN, chatId, 
+              '🎰 欢迎来到德州扑克游戏！发送 /newgame 创建房间'
+            );
+          }
+          // 响应 /newgame
+          else if (text.startsWith('/newgame')) {
+            console.log('Handling /newgame command');
+            await sendTelegramMessage(env.TELEGRAM_BOT_TOKEN, chatId, 
+              '✅ 房间已创建！点击下方按钮进入游戏'
+            );
+          }
+          // 响应其他消息
+          else {
+            console.log('Handling other message');
+            await sendTelegramMessage(env.TELEGRAM_BOT_TOKEN, chatId, 
+              '收到消息：' + text
+            );
+          }
+        }
+        
+        console.log('=== WEBHOOK PROCESSING COMPLETE ===');
+        return new Response('OK', {
+          headers: addCorsHeaders(new Headers())
+        });
+      }
+      
+      console.log('Route not found:', url.pathname);
+      return new Response('Not Found', { 
+        status: 404,
+        headers: addCorsHeaders(new Headers())
+      });
+      
+    } catch (error) {
+      console.error('=== GLOBAL ERROR ===');
+      console.error('Error:', error);
+      console.error('Error stack:', error.stack);
+      return new Response('Error: ' + error.message, { 
+        status: 500,
+        headers: addCorsHeaders(new Headers())
+      });
+    }
+  }
+};
