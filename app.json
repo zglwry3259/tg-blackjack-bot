@@ -1,0 +1,28 @@
+{
+  "name": "Telegram Poker Bot",
+  "description": "完整的Telegram德州扑克游戏Bot，支持多人联机对战",
+  "repository": "https://github.com/yourusername/telegram-poker-bot",
+  "logo": "https://cdn-icons-png.flaticon.com/512/1053/1053317.png",
+  "keywords": ["telegram", "bot", "poker", "game", "cloudflare"],
+  "env": {
+    "TELEGRAM_BOT_TOKEN": {
+      "description": "Telegram Bot Token (从 @BotFather 获取)",
+      "required": true
+    },
+    "TELEGRAM_WEB_APP_URL": {
+      "description": "Telegram Web App URL",
+      "required": true
+    },
+    "WEBHOOK_SECRET": {
+      "description": "Webhook验证密钥",
+      "generator": "secret",
+      "required": true
+    }
+  },
+  "cloudflare": {
+    "workers": true,
+    "pages": true,
+    "d1": true,
+    "kv": true
+  }
+}

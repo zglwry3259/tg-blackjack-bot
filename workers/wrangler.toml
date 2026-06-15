@@ -1,0 +1,12 @@
+name = "telegram-poker-bot"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "ROOMS"
+id = "your-kv-namespace-id"
+
+[vars]
+TELEGRAM_BOT_TOKEN = "your-bot-token"
+TELEGRAM_WEB_APP_URL = "https://your-project.pages.dev"
+WEBHOOK_SECRET = "your-webhook-secret"

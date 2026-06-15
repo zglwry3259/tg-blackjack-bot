@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #0D6E4B 0%, #0A4D35 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.card {
+  width: 50px; height: 70px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  background: white;
+}
+
+.card-back {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+  border: 2px solid #4a90c2;
+}
+
+.card-red { color: #E53E3E; }
+.card-black { color: #1A1A1A; }
+
+.btn {
+  @apply px-6 py-3 rounded-lg font-bold transition-all duration-200;
+}
+
+.btn-primary { @apply bg-poker-gold text-poker-black hover:bg-yellow-400; }
+.btn-danger { @apply bg-poker-red text-white hover:bg-red-600; }
+.btn-secondary { @apply bg-gray-600 text-white hover:bg-gray-700; }
+.btn-success { @apply bg-green-600 text-white hover:bg-green-700; }
+
+.player-seat {
+  @apply rounded-xl p-3 transition-all duration-300;
+  background: rgba(0,0,0,0.3);
+  border: 2px solid transparent;
+}
+
+.player-seat.active {
+  border-color: #FFD700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.pot-display {
+  @apply text-center py-2 px-4 rounded-full;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid #FFD700;
+}

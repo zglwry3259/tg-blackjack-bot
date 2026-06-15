@@ -27,17 +27,9 @@
 telegram-poker-bot/
 ├── src/                    # Python Bot 后端
 │   ├── bot.py             # Bot主入口
-│   ├── game/              # 游戏逻辑
-│   ├── models/            # 数据模型
-│   └── utils/             # 工具函数
+│   └── game/              # 游戏逻辑
 ├── frontend/              # Telegram Web App (Vue3)
-│   ├── src/
-│   ├── public/
-│   └── package.json
 ├── workers/               # Cloudflare Workers
-│   ├── src/
-│   ├── wrangler.toml
-│   └── package.json
 ├── docs/                  # 文档
 └── README.md
 ```
@@ -64,7 +56,6 @@ cd workers && npm install
 ```env
 TELEGRAM_BOT_TOKEN=your_bot_token
 TELEGRAM_WEB_APP_URL=your_web_app_url
-CLOUDFLARE_ACCOUNT_ID=your_account_id
 ```
 
 ### 3. 启动开发服务
@@ -72,17 +63,9 @@ CLOUDFLARE_ACCOUNT_ID=your_account_id
 ```bash
 # 启动Bot
 python src/bot.py
-
-# 启动前端开发服务器
-cd frontend && npm run dev
-
-# 启动Workers本地预览
-cd workers && npm run dev
 ```
 
-## 📖 使用说明
-
-### Bot命令
+## 📖 Bot命令
 
 - `/start` - 开始使用Bot
 - `/newgame` - 创建新游戏房间
@@ -90,37 +73,23 @@ cd workers && npm run dev
 - `/rules` - 查看游戏规则
 - `/help` - 查看帮助
 
-### 游戏流程
-
-1. 在私聊或群聊中发送 `/newgame` 创建房间
-2. Bot会生成邀请链接和Web App按钮
-3. 好友点击链接或按钮加入游戏
-4. 人数足够后自动开始游戏
-5. 通过Web App进行下注、弃牌等操作
-
 ## 🎲 游戏规则
 
-### 基本规则
-- 使用标准52张扑克牌
-- 每位玩家发2张底牌
-- 公共牌分三轮发出：翻牌(3张)、转牌(1张)、河牌(1张)
-- 玩家可选择：弃牌(Fold)、过牌(Check)、跟注(Call)、加注(Raise)、全押(All-in)
-
-### 牌型大小
-1. 皇家同花顺 (Royal Flush)
-2. 同花顺 (Straight Flush)
-3. 四条 (Four of a Kind)
-4. 葫芦 (Full House)
-5. 同花 (Flush)
-6. 顺子 (Straight)
-7. 三条 (Three of a Kind)
-8. 两对 (Two Pair)
-9. 一对 (One Pair)
-10. 高牌 (High Card)
+### 牌型大小（从大到小）
+1. 皇家同花顺
+2. 同花顺
+3. 四条
+4. 葫芦
+5. 同花
+6. 顺子
+7. 三条
+8. 两对
+9. 一对
+10. 高牌
 
 ## 🔧 部署指南
 
-详细部署说明请查看 [DEPLOY.md](./docs/DEPLOY.md)
+详细部署说明请查看 [docs/DEPLOY.md](./docs/DEPLOY.md)
 
 ## 📄 许可证
 
