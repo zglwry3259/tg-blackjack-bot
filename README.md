@@ -17,6 +17,11 @@
 
 ## 📋 前置要求
 
+### ⚠️ 版本兼容性说明（重要！）
+- **Python**: 推荐 3.11 或 3.12（Python 3.13 存在 pydantic-core 兼容性问题）
+- **Node.js**: 推荐 18.x 或 20.x
+
+### 必需账号
 - Telegram Bot Token ([@BotFather](https://t.me/BotFather))
 - Cloudflare 账号
 - GitHub 账号

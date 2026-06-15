@@ -4,9 +4,9 @@ compatibility_date = "2024-01-01"
 
 [[kv_namespaces]]
 binding = "ROOMS"
-id = "af24b70437a9498289bd26863eb9f79f"
+id = "your-kv-namespace-id"
 
 [vars]
-TELEGRAM_BOT_TOKEN = "8954267735:AAE_w1CLmof2kK62BM1njpQrvF6g-NvEyQA"
+TELEGRAM_BOT_TOKEN = "your-bot-token"
 TELEGRAM_WEB_APP_URL = "https://your-project.pages.dev"
-WEBHOOK_SECRET = "200211143259zlr"
+WEBHOOK_SECRET = "your-webhook-secret"

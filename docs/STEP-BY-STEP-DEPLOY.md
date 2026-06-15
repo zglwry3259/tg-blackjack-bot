@@ -23,6 +23,22 @@
 
 ## 🔧 0.1 安装必要工具
 
+### ⚠️ Python 版本兼容性说明（重要！）
+
+**重要提示：** 推荐使用 Python 3.11 或 3.12。Python 3.13 存在 pydantic-core 兼容性问题。
+
+检查Python版本：
+```bash
+python --version  # 应该是 3.11.x 或 3.12.x
+```
+
+如果是Python 3.13，请降级或使用：
+```bash
+# 使用pyenv切换版本（推荐）
+pyenv install 3.12.0
+pyenv global 3.12.0
+```
+
 ### 0.1.1 安装 Node.js
 
 【新手提示】Node.js是运行JavaScript的环境，必须安装！
@@ -310,6 +326,15 @@ Telegram Poker Bot Worker
 | **Build command** | `cd frontend && npm install && npm run build` |
 | **Build output directory** | `frontend/dist` |
 
+#### 3.3.1 环境变量配置（必须）
+
+在 **Environment variables (advanced)** 部分添加：
+
+| 变量名 | 值 | 说明 |
+|--------|-----|------|
+| `PYTHON_VERSION` | `3.12` | 避免Python 3.13兼容性问题 |
+| `NODE_VERSION` | `20` | 指定Node.js版本 |
+
 #### 3.4 点击 **Save and Deploy**
 
 等待1-2分钟，部署完成！
@@ -526,6 +551,21 @@ https://my-texas-poker.pages.dev
 1. 检查KV绑定是否正确
 2. 确认API请求成功
 3. 查看浏览器控制台Network标签
+
+### Q6: 安装依赖时报错 `pydantic-core` 构建失败？
+
+**错误信息：**
+```
+TypeError: ForwardRef._evaluate() missing 1 required keyword-only argument: 'recursive_guard'
+ERROR: Failed building wheel for pydantic-core
+```
+
+**原因：** Python 3.13 与旧版 pydantic-core 不兼容
+
+**解决方案（三选一）：**
+1. ✅ **降级 Python 到 3.11 或 3.12**（推荐）
+2. ✅ 更新 requirements.txt 使用 `pydantic>=2.9.0` 和 `pydantic-core>=2.23.0`
+3. ✅ Cloudflare Pages 设置环境变量 `PYTHON_VERSION=3.12`
 
 ---
 
