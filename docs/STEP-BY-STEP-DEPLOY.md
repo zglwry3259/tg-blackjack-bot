@@ -143,6 +143,57 @@ Keep your token secure and store it safely, it can be used by anyone to control 
 
 ---
 
+## 🚀 0.5 关于"一键部署"的诚实说明
+
+> 💡 **新手必读**：点击按钮前请先了解真实情况！
+
+### ✅ "Deploy to Cloudflare" 按钮能自动完成：
+
+- ✅ 自动创建Cloudflare Worker项目
+- ✅ 自动创建KV命名空间并绑定
+- ✅ 自动创建D1数据库（如果配置）
+- ✅ 自动部署Worker代码
+- ✅ 自动设置大部分环境变量
+- ✅ GitHub仓库自动连接
+
+### ❌ 一键部署**不能**自动完成（必须手动）：
+
+1. **@BotFather 创建Bot和获取Token**（Telegram限制，无法自动化）
+2. **设置Telegram Webhook URL**（需要Worker部署后的域名）
+3. **@BotFather 设置Web App域名**（需要Pages部署后的域名）
+4. **部署Cloudflare Pages前端**（官方按钮只支持Worker）
+5. **更新 TELEGRAM_WEB_APP_URL 环境变量**
+
+### 一键部署完整流程（用户点击按钮后）：
+
+```
+1. 用户点击"Deploy to Cloudflare"按钮
+   ↓
+2. 跳转到Cloudflare，授权GitHub权限
+   ↓
+3. Cloudflare自动fork仓库到用户GitHub
+   ↓
+4. 用户填写 TELEGRAM_BOT_TOKEN（唯一必填项）
+   ↓
+5. 点击"Deploy"，等待3-5分钟
+   ↓
+6. ✅ Worker部署完成，获得 xxx.workers.dev 域名
+   ↓
+7. ⚠️ 用户手动执行剩余3步：
+   ├─ 部署Pages前端（5分钟）
+   ├─ 设置Webhook（1分钟）
+   └─ @BotFather配置Web App域名（1分钟）
+```
+
+### 🎯 推荐部署路径
+
+| 用户类型 | 推荐方式 | 总用时 |
+|---------|---------|--------|
+| **纯新手** | 一键部署Worker + 手动完成剩余3步 | 10分钟 |
+| **开发者** | 全程命令行部署 | 15分钟 |
+
+---
+
 ## 📦 第1章：准备代码并上传到GitHub
 
 ### 1.1 下载项目源码
