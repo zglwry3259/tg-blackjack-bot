@@ -1,5 +1,10 @@
 # 🚀 真正零命令行部署指南（全程网页点击）
 
+> ⚠️ **非常重要：Worker 和 Pages 是两个独立部署！**
+> - **Worker** = 后端Bot Webhook = 部署 `workers/` 代码
+> - **Pages** = 前端Web App = 部署 `frontend/` 代码
+> - 它们是两个完全分开的服务，有各自的域名！不要搞混！
+
 > ✅ **推荐给所有用户**：不需要命令行，不需要git，不需要编程基础
 >
 > ⏱️ **预计用时**：15分钟
@@ -125,13 +130,13 @@ https://poker-bot.yourname.workers.dev
 4. 选择你解压的项目 → `frontend` 文件夹
 5. ⚠️ **重要：不要点部署！先设置下面的配置**
 
-### 步骤3：设置构建配置
+### 步骤3：设置构建配置（非常重要！）
 
 1. 往下找到 **Build settings**
 2. 设置：
    - **Framework preset**: `None`（不要选Vite！）
-   - **Build command**: `npm install && npm run build`
-   - **Build output directory**: `dist`
+   - **Build command**: `npm run build`（或 `cd frontend && npm install && npm run build`）
+   - **Build output directory**: `frontend/dist`
 
 ### 步骤4：设置环境变量（必须！）
 
@@ -248,11 +253,25 @@ https://api.telegram.org/bot1234567890:ABCdefGhIJKlmNoPQRsTUVwxyZ1234567890/setW
 
 ## ❓ 常见问题
 
+### Q: Pages构建报错 `no such file or directory, open '/.../package.json'`
+
+**错误信息：**
+```
+npm error Could not read package.json: Error: ENOENT: no such file or directory
+```
+
+**原因：** Pages默认在根目录构建，但前端代码在 `frontend/` 子目录
+
+**解决方案：**
+1. ✅ 根目录已有 package.json（本项目已修复）
+2. ✅ 构建命令填：`npm run build` 或 `cd frontend && npm install && npm run build`
+3. ✅ 输出目录填：`frontend/dist`
+
 ### Q: Pages 构建失败怎么办？
 
 **A:** 检查：
-1. Build command 是否正确：`npm install && npm run build`
-2. Build output directory 是否是 `dist`
+1. Build command 是否正确：`npm run build`
+2. Build output directory 是否是 `frontend/dist`
 3. 是否设置了 `PYTHON_VERSION=3.12`
 
 ### Q: Webhook 设置失败？

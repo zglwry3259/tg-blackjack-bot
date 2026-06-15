@@ -1,5 +1,10 @@
 # 部署指南
 
+> ⚠️ **非常重要：Worker 和 Pages 是两个独立部署！**
+> - **Worker** = 后端Bot Webhook = 部署 `workers/` 代码
+> - **Pages** = 前端Web App = 部署 `frontend/` 代码
+> - 它们是两个完全分开的服务，有各自的域名！不要搞混！
+
 ## 🚀 一键部署
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/yourusername/telegram-poker-bot)

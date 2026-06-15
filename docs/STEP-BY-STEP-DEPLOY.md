@@ -1,5 +1,10 @@
 # 🚀 从零开始：超详细部署教程（新手友好）
 
+> ⚠️ **非常重要：Worker 和 Pages 是两个独立部署！**
+> - **Worker** = 后端Bot Webhook = 部署 `workers/` 代码
+> - **Pages** = 前端Web App = 部署 `frontend/` 代码
+> - 它们是两个完全分开的服务，有各自的域名！不要搞混！
+
 > ✅ **写给新手**：本教程每一步都有具体命令，照着复制粘贴即可完成！
 >
 > ⏱️ **预计用时**：30-45分钟
@@ -603,7 +608,21 @@ https://my-texas-poker.pages.dev
 2. 确认API请求成功
 3. 查看浏览器控制台Network标签
 
-### Q6: 安装依赖时报错 `pydantic-core` 构建失败？
+### Q6: Pages构建报错 `no such file or directory, open '/.../package.json'`
+
+**错误信息：**
+```
+npm error Could not read package.json: Error: ENOENT: no such file or directory
+```
+
+**原因：** Pages默认在根目录构建，但前端代码在 `frontend/` 子目录
+
+**解决方案：**
+1. ✅ 根目录已有 package.json（本项目已修复）
+2. ✅ 构建命令填：`npm run build` 或 `cd frontend && npm install && npm run build`
+3. ✅ 输出目录填：`frontend/dist`
+
+### Q7: 安装依赖时报错 `pydantic-core` 构建失败？
 
 **错误信息：**
 ```

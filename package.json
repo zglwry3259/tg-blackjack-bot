@@ -1,0 +1,9 @@
+{
+  "name": "telegram-poker-bot-root",
+  "version": "1.0.0",
+  "description": "Telegram Texas Poker Bot",
+  "scripts": {
+    "install": "cd frontend && npm install",
+    "build": "cd frontend && npm run build"
+  }
+}
