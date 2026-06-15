@@ -4,7 +4,7 @@ import { ref, onMounted, reactive, computed } from 'vue'
 // ==================== 配置 ====================
 // ⚠️ 重要：这里必须填你的Worker域名，不是Pages域名！
 // 示例：'https://poker-bot.yourname.workers.dev'
-const API_BASE_URL = 'https://your-worker.workers.dev';
+const API_BASE_URL = 'https://game.ttyun.eu.org/';
 
 console.log('=== App 启动 ===');
 console.log('API Base URL:', API_BASE_URL);
