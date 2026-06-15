@@ -1,38 +1,127 @@
-# 🃏 TG Blackjack Bot — Cloudflare Pages 联机21点
+# 🎰 Telegram 德州扑克 Bot
 
-> 部署在 **Cloudflare Pages** 上的 **Telegram Bot**，支持多人联机对战 21点（Blackjack）游戏。
-> 通过 **Telegram Mini App（小程序）** 提供游戏界面，使用 **Durable Objects + WebSocket** 实现实时联机。
+一个完整的Telegram德州扑克游戏Bot，支持多人联机对战，通过Telegram Web App进行游戏，可一键邀请好友或在群内发起游戏。
 
-## ✨ 功能特性
+## ✨ 特性
 
-- 🎮 **完整21点游戏**：标准规则 + Blackjack 加成奖励
-- 👥 **多人联机**：最多 5 人同时在线对战（WebSocket 实时同步）
-- 📱 **Telegram Mini App**：点击按钮直接打开游戏，无需离开 Telegram
-- 💬 **房间聊天**：游戏中可实时文字交流
-- 🔗 **邀请链接**：一键分享房间给好友
-- 🎨 **精美 UI**：扑克牌动画、响应式设计、深色主题
-- ☁️ **零服务器成本**：完全运行在 Cloudflare 免费额度内
+- 🎮 **完整德州扑克游戏逻辑** - 支持2-10人联机对战
+- 📱 **Telegram Web App** - 精美的移动端游戏界面
+- 🔗 **房间系统** - 创建私人/公开房间，生成邀请链接
+- 👥 **群支持** - 直接在Telegram群内发起游戏
+- ☁️ **Cloudflare部署** - Serverless架构，全球加速
+- 🚀 **一键部署** - GitHub Actions + Cloudflare自动部署
 
-## 🚀 一键部署（GitHub Actions）
+## 🚀 一键部署
 
-本项目已配置 **GitHub Actions 自动部署**，推送代码到 main 分支即可自动部署！
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/yourusername/telegram-poker-bot)
 
-### 配置 Secrets：
-仓库 → **Settings → Secrets and variables → Actions → New repository secret**
+## 📋 前置要求
 
-| Secret 名 | 值 | 获取方式 |
-|-----------|-----|----------|
-| `CLOUDFLARE_API_TOKEN` | CF API Token | Dashboard → My Profile → API Tokens → Create Token |
-| `CLOUDFLARE_ACCOUNT_ID` | Account ID | CF Dashboard 右侧栏 → API |
+- Telegram Bot Token ([@BotFather](https://t.me/BotFather))
+- Cloudflare 账号
+- GitHub 账号
 
-### 手动触发：
-仓库 → **Actions → Deploy to Cloudflare Pages → Run workflow**
+## 🏗️ 项目结构
 
-## 📋 游戏规则
+```
+telegram-poker-bot/
+├── src/                    # Python Bot 后端
+│   ├── bot.py             # Bot主入口
+│   ├── game/              # 游戏逻辑
+│   ├── models/            # 数据模型
+│   └── utils/             # 工具函数
+├── frontend/              # Telegram Web App (Vue3)
+│   ├── src/
+│   ├── public/
+│   └── package.json
+├── workers/               # Cloudflare Workers
+│   ├── src/
+│   ├── wrangler.toml
+│   └── package.json
+├── docs/                  # 文档
+└── README.md
+```
 
-- A = 1或11点，J/Q/K = 10点
-- Hit要牌 / Stand停牌
-- >21爆牌输，Blackjack前两张=21大赢
-- 庄家<17必须要，≥17停牌
+## 🛠️ 本地开发
+
+### 1. 安装依赖
+
+```bash
+# Python后端
+pip install -r requirements.txt
+
+# Web App前端
+cd frontend && npm install
+
+# Cloudflare Workers
+cd workers && npm install
+```
+
+### 2. 配置环境变量
+
+复制 `.env.example` 为 `.env` 并填写配置：
+
+```env
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_WEB_APP_URL=your_web_app_url
+CLOUDFLARE_ACCOUNT_ID=your_account_id
+```
+
+### 3. 启动开发服务
+
+```bash
+# 启动Bot
+python src/bot.py
+
+# 启动前端开发服务器
+cd frontend && npm run dev
+
+# 启动Workers本地预览
+cd workers && npm run dev
+```
+
+## 📖 使用说明
+
+### Bot命令
+
+- `/start` - 开始使用Bot
+- `/newgame` - 创建新游戏房间
+- `/join [room_id]` - 加入指定房间
+- `/rules` - 查看游戏规则
+- `/help` - 查看帮助
+
+### 游戏流程
+
+1. 在私聊或群聊中发送 `/newgame` 创建房间
+2. Bot会生成邀请链接和Web App按钮
+3. 好友点击链接或按钮加入游戏
+4. 人数足够后自动开始游戏
+5. 通过Web App进行下注、弃牌等操作
+
+## 🎲 游戏规则
+
+### 基本规则
+- 使用标准52张扑克牌
+- 每位玩家发2张底牌
+- 公共牌分三轮发出：翻牌(3张)、转牌(1张)、河牌(1张)
+- 玩家可选择：弃牌(Fold)、过牌(Check)、跟注(Call)、加注(Raise)、全押(All-in)
+
+### 牌型大小
+1. 皇家同花顺 (Royal Flush)
+2. 同花顺 (Straight Flush)
+3. 四条 (Four of a Kind)
+4. 葫芦 (Full House)
+5. 同花 (Flush)
+6. 顺子 (Straight)
+7. 三条 (Three of a Kind)
+8. 两对 (Two Pair)
+9. 一对 (One Pair)
+10. 高牌 (High Card)
+
+## 🔧 部署指南
+
+详细部署说明请查看 [DEPLOY.md](./docs/DEPLOY.md)
+
+## 📄 许可证
 
 MIT License
