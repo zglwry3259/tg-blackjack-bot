@@ -267,6 +267,20 @@ npm error Could not read package.json: Error: ENOENT: no such file or directory
 2. ✅ 构建命令填：`npm run build` 或 `cd frontend && npm install && npm run build`
 3. ✅ 输出目录填：`frontend/dist`
 
+### Q: Tailwind构建报错 `The 'text-poker-xxx' class does not exist`
+
+**错误信息：**
+```
+The `text-poker-black` class does not exist. If `text-poker-black` is a custom class, make sure it is defined within a `@layer` directive.
+```
+
+**原因：** tailwind.config.js中没有定义poker自定义颜色
+
+**解决方案：**
+1. ✅ 项目已修复，tailwind.config.js已添加完整poker颜色定义
+2. ✅ 清除浏览器缓存，重新触发Pages部署
+3. ✅ 或使用标准Tailwind类：`text-gray-800` 代替 `text-poker-black`
+
 ### Q: Pages 构建失败怎么办？
 
 **A:** 检查：
